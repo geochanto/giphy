@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+        crossorigin="anonymous">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+    <title>Homework 6</title>
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+            <div id="buttons" class="col-12 col-md-6 col-lg-6"></div>
+            <div id="formWrap" class="col-12 col-md-6 col-lg-6">
+                <div class="form-group">
+                    <input type="text" class="form-control" placeholder="Add another button...">
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+        </div>
+        <div class="row">
+            <div id="gifs-appear-here" class="col-12">
+            </div>
+        </div>
+    </div>
+    <!-- Modal -->
+    <div class="modal fade" id="answerModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">Not so fast!</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script type="text/javascript">
+        $('document').ready(function () {
+            //array with topics
+            var topics = [
+                "cat",
+                "dog",
+                "mouse"
+            ]
+
+            //function loop to display all topics in buttons
+            function displayTopics() {
+                for (var i = 0; i < topics.length; i++) {
+                    $('#buttons').append('<div class="btn btn-info get-giphy" data-attribute=' + topics[i] +
+                        '>' + topics[i] +
+                        '</div>');
+                }
+            }
+
+            //on clicking button
+            $('#buttons').on('click', '.get-giphy', function () {
+                //set topic to the clicked button's data-attribute
+                var topic = $(this).attr('data-attribute');
+
+                //set query URL to picked topic
+                var queryURL = "https://api.giphy.com/v1/gifs/search?q=" + topic +
+                    "&api_key=O2X0wRMnWEjylyUypx1F5UVxCz5Jp8kr&limit=10";
+
+                //ajax call to Giphy API
+                $.ajax({
+                    url: queryURL,
+                    method: 'GET'
+                }).then(function (response) {
+                    console.log(response);
+                    // Storing an array of results in the results variable
+                    var results = response.data;
+
+                    // Looping over every result item
+                    for (var i = 0; i < results.length; i++) {
+
+                        // Only taking action if the photo has an appropriate rating
+                        if (results[i].rating !== "r") {
+                            // Creating a div with the class "item"
+                            var gifDiv = $("<div class='item'>");
+
+                            // Storing the result item's rating
+                            var rating = results[i].rating;
+
+                            // Creating a paragraph tag with the result item's rating
+                            var p = $("<p>").text("Rating: " + rating);
+
+                            // Creating an image tag
+                            var topicImage = $("<img>");
+
+                            // Giving the image tag necessary attributes
+                            topicImage.attr({
+                                "class": "topicImage",
+                                "src": results[i].images.fixed_height_still.url,
+                                "data-state": "still",
+                                "data-still": results[i].images.fixed_height_still.url,
+                                "data-animate": results[i].images.fixed_height.url
+                            });
+
+                            // Appending the paragraph and personImage we created to the "gifDiv" div we created
+                            gifDiv.append(topicImage);
+                            gifDiv.append(p);
+
+                            // Prepending the gifDiv to the "#gifs-appear-here" div in the HTML
+                            $("#gifs-appear-here").prepend(gifDiv);
+                        }
+                    }
+                });
+
+                $('#gifs-appear-here').on('click', '.topicImage', function () {
+                    var state = $(this).attr("data-state");
+                    if (state === "still") {
+                        $(this).attr("src", $(this).attr("data-animate"));
+                        $(this).attr("data-state", "animate");
+                    } else {
+                        $(this).attr("src", $(this).attr("data-still"));
+                        $(this).attr("data-state", "still");
+                    }
+                });
+
+            });
+
+            displayTopics();
+
+            $('button[type="submit"]').click(function () {
+                var inputValue = $('.form-control').val().trim();
+                if (topics.includes(inputValue)) {
+                    $('.modal').modal('show');
+                    $('.modal-body').html('You already have a button for <b>' + inputValue +
+                        '</b>. Use it or add something else');
+                    setTimeout(function () {
+                        $('.modal').modal('hide');
+                    }, 4000);
+                } else {
+                    topics.push(inputValue);
+                    $('#buttons').empty();
+                    displayTopics();
+                }
+
+            });
+            $('#formWrap').keypress(function (e) {
+                if (e.which == 13) { //Enter key pressed
+                    $('#formWrap').click(); //Trigger search button click event
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
