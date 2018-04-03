@@ -1,0 +1,38 @@
+.row {
+    margin-top: 30px;
+}
+
+.col {
+    background-color: #eee;
+    padding: 15px;
+    border-radius: 10px;
+}
+
+.get-giphy {
+    margin: 0 15px 15px 0;
+}
+
+.topicImage {
+    max-width: 100%;
+}
+
+@media all and (min-width: 768px) {
+#buttons {
+    border-right: 15px solid #fff;
+}
+
+#formWrap {
+    border-left: 15px solid #fff;
+}
+}
+
+@media all and (max-width: 768px) {
+    #buttons {
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+    #formWrap {
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+    }
+}
