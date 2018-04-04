@@ -36,3 +36,10 @@
         border-top-right-radius: 0;
     }
 }
+
+@media all and (max-width: 575px) {
+    .row {
+        margin-left: 0;
+        margin-right: 0;
+    }
+}

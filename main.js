@@ -7,7 +7,7 @@ $('document').ready(function () {
         "Maradona",
         "Pele"
     ]
-
+    
     //function loop to display all topics in buttons
     function displayTopics() {
         for (var i = 0; i < topics.length; i++) {
@@ -46,25 +46,30 @@ $('document').ready(function () {
                 // Only taking action if the photo has an appropriate rating
                 if (results[i].rating !== "r") {
                     // Creating a div with the class "item"
-                    var gifDiv = $("<div class='item'>");
+                    var gifDiv = $("<div class='item'></div>");
 
                     // Storing the result item's rating
                     var rating = results[i].rating;
 
                     // Creating a paragraph tag with the result item's rating
-                    var p = $("<p>").text("Rating: " + rating);
+                    var p = $("<p></p>").text("Rating: " + rating);
 
                     // Creating an image tag
                     var topicImage = $("<img>");
 
                     // Giving the image tag necessary attributes
                     topicImage.attr({
-                        "class": "topicImage",
+                        "class": "topicImage"
+                    });
+
+                    topicImage.prop({
                         "src": results[i].images.fixed_height_still.url,
                         "data-state": "still",
                         "data-still": results[i].images.fixed_height_still.url,
                         "data-animate": results[i].images.fixed_height.url
                     });
+
+                    
 
                     // Appending the paragraph and personImage we created to the "gifDiv" div we created
                     gifDiv.append(topicImage);
@@ -75,26 +80,29 @@ $('document').ready(function () {
                 }
             }
         });
-        $('#gifs-appear-here').on('click', '.topicImage', function () {
-            var state = $(this).attr("data-state");
-            if (state === "still") {
-                $(this).attr("src", $(this).attr("data-animate"));
-                $(this).attr("data-state", "animate");
-                console.log('its still');
-            } else if (state === "animate") {
-                $(this).attr("src", $(this).attr("data-still"));
-                $(this).attr("data-state", "still");
-                console.log('its animated');
-            }
-            else {
-                return false;
-            }
-        });
-
     });
 
+    $('#gifs-appear-here').on('click', '.topicImage', function () {
+        var state = $(this).prop("data-state");
+        if (state === "still") {
+            $(this).prop("data-state", "animate");
+            $(this).prop("src", $(this).prop("data-animate"));
+            
+            console.log('still --> animate');
+        } else if (state === "animate") {
+            $(this).prop("data-state", "still");
+            $(this).prop("src", $(this).prop("data-still"));
+            console.log('animate --> still');
+        }
+        else {
+            return false;
+        }
+    });
+
+    //add buttons
     $('button[type="submit"]').click(function () {
         var inputValue = $('.form-control').val().trim();
+        //don't add buttons if they're already in topics array
         if (topics.includes(inputValue)) {
             $('.modal').modal('show');
             $('.modal-body').html('You already have a button for <b>' + inputValue +
@@ -102,6 +110,7 @@ $('document').ready(function () {
             setTimeout(function () {
                 $('.modal').modal('hide');
             }, 4000);
+        //add buttons if they aren't in the topics array
         } else {
             topics.push(inputValue);
             $('#buttons').empty();
